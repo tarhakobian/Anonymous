@@ -1,0 +1,8 @@
+POST http://localhost:8080/anonymous-posts/
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI5ZmFlZDgyYy1jNGYwLTQzZTQtOTE4NC03ZmY4M2UyMDA5ZTMiLCJleHAiOjE3MDEyNTA0NzAsImF1dGhvcml0aWVzIjpbIlNUVURFTlQiXX0.TtTX1Eua63cw4bhjiMWcOaetazVD6JT14gFdqBwBFub0rPUyEhsJ9qTGuXPCb1N1hV8cBNJaaYrklfijd-GUZg
+Content-Type: application/json
+
+{
+
+  "usernamePublic": true
+}
