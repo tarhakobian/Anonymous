@@ -3,6 +3,5 @@ Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI5ZmFlZDgyY
 Content-Type: application/json
 
 {
-
   "usernamePublic": true
 }

@@ -38,6 +38,7 @@ public class PostService {
 
         PostEntity postEntity = new PostEntity();
 
+
         postEntity.setUrl("temporary url");
         postEntity.setPublisher(userEntity);
         postEntity.setUsernamePublic(request.isUsernamePublic());

@@ -34,5 +34,5 @@ public class CommentController {
         commentService.edit(commentId, content);
         return new ResponseEntity<>(HttpStatus.OK);
     }
-    
+
 }

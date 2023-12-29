@@ -52,6 +52,7 @@ public class PostController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
+
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/anonymous-posts/like/{postId}")
     public ResponseEntity<?> like(@PathVariable Integer postId) {
