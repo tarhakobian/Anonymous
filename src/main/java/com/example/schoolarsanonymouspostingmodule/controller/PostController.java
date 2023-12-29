@@ -3,6 +3,8 @@ package com.example.schoolarsanonymouspostingmodule.controller;
 import com.example.schoolarsanonymouspostingmodule.model.dto.request.PostRequest;
 import com.example.schoolarsanonymouspostingmodule.model.dto.responce.PostResponse;
 import com.example.schoolarsanonymouspostingmodule.service.PostService;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -11,58 +13,50 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
+@PreAuthorize("isAuthenticated()")
 public class PostController {
 
     private final PostService postService;
 
-    @PreAuthorize("isAuthenticated()")
     @GetMapping("/anonymous-posts/")
-    public ResponseEntity<?> getAllPosts() {
-        return ResponseEntity.ok(postService.getAll());
+    public ResponseEntity<?> getAllPosts(@RequestParam(defaultValue = "0") Integer pageNumber,
+                                         @RequestParam(defaultValue = "5") Integer size) {
+        return ResponseEntity.ok(postService.getAll(pageNumber, size));
     }
 
     //TODO;: test
-    @PreAuthorize("isAuthenticated()")
-    @GetMapping("/anonymous-posts/{post-id}")
-    public ResponseEntity<?> getPostById(@PathVariable("post-id") Integer postId) {
+    @GetMapping("/anonymous-posts/{postId}")
+    public ResponseEntity<?> getPostById(@PathVariable("postId") @NotNull Integer postId) {
         PostResponse response = postService.getById(postId);
         return ResponseEntity.ok(response);
     }
 
-    //TODO : add @Valid after integrating with S3
-    @PreAuthorize("isAuthenticated()")
     @PostMapping("/anonymous-posts/")
-    public ResponseEntity<?> create(@RequestBody PostRequest request) {
-
+    public ResponseEntity<?> create(@RequestBody @Valid PostRequest request) {
         return ResponseEntity.ok(postService.create(request));
     }
 
-    @PreAuthorize("isAuthenticated()")
-    @PutMapping("/anonymous-posts/{post-id}")
-    public ResponseEntity<?> edit(@PathVariable("post-id") Integer postId,
-                                  @RequestBody PostRequest request) {
+    @PutMapping("/anonymous-posts/{postId}")
+    public ResponseEntity<?> edit(@PathVariable("postId") @NotNull Integer postId,
+                                  @RequestBody @Valid PostRequest request) {
         postService.edit(postId, request);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @PreAuthorize("isAuthenticated()")
-    @DeleteMapping("/anonymous-posts/{post-id}")
-    public ResponseEntity<?> delete(@PathVariable("post-id") Integer postId) {
+    @DeleteMapping("/anonymous-posts/{postId}")
+    public ResponseEntity<?> delete(@PathVariable("postId") @NotNull Integer postId) {
         postService.delete(postId);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-
-    @PreAuthorize("isAuthenticated()")
     @PostMapping("/anonymous-posts/like/{postId}")
-    public ResponseEntity<?> like(@PathVariable Integer postId) {
+    public ResponseEntity<?> like(@PathVariable @NotNull Integer postId) {
         postService.like(postId);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @PreAuthorize("isAuthenticated()")
     @DeleteMapping("/anonymous-posts/like/{postId}")
-    public ResponseEntity<?> unLike(@PathVariable Integer postId) {
+    public ResponseEntity<?> unLike(@PathVariable @NotNull Integer postId) {
         postService.unLike(postId);
         return new ResponseEntity<>(HttpStatus.OK);
     }

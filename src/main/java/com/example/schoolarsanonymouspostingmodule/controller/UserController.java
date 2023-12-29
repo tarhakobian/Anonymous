@@ -28,4 +28,6 @@ public class UserController {
         UUID uuid = service.setUsername(username);
         return ResponseEntity.ok(uuid);
     }
+
+
 }

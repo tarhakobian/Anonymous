@@ -3,6 +3,7 @@ package com.example.schoolarsanonymouspostingmodule.service;
 import com.example.schoolarsanonymouspostingmodule.exception.CommentNotFoundException;
 import com.example.schoolarsanonymouspostingmodule.exception.PostNotFoundException;
 import com.example.schoolarsanonymouspostingmodule.exception.UserNotFoundException;
+import com.example.schoolarsanonymouspostingmodule.model.dto.request.CommentRequest;
 import com.example.schoolarsanonymouspostingmodule.model.entity.CommentEntity;
 import com.example.schoolarsanonymouspostingmodule.model.entity.PostEntity;
 import com.example.schoolarsanonymouspostingmodule.model.entity.UserEntity;
@@ -26,24 +27,20 @@ public class CommentService {
     private final UserRepository userRepository;
 
 
-    public void comment(Integer postId, String content) {
-        //find post
-        PostEntity postEntity = postRepository.findById(postId)
+    public void comment(CommentRequest request) {
+        PostEntity postEntity = postRepository.findById(request.getPostId())
                 .orElseThrow(PostNotFoundException::new);
 
-        //find user
         UUID userId = UUID.fromString(String.valueOf(SecurityContextHolder
                 .getContext().getAuthentication().getPrincipal()));
         UserEntity publisher = userRepository.findById(userId)
                 .orElseThrow(UserNotFoundException::new);
 
-        //create new comment
         CommentEntity commentEntity = new CommentEntity();
-        commentEntity.setContent(content);
+        commentEntity.setContent(request.getContent());
         commentEntity.setPost(postEntity);
         commentEntity.setPublisher(publisher);
 
-        //save comment
         commentRepository.save(commentEntity);
     }
 

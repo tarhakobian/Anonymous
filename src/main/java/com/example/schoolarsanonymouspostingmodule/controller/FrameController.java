@@ -14,18 +14,16 @@ import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequiredArgsConstructor
+@PreAuthorize("isAuthenticated()")
 public class FrameController {
 
     private final FrameService service;
 
-    @PreAuthorize("isAuthenticated()")
     @GetMapping("/anonymous-posts/frames/get-current-frame")
     public ResponseEntity<?> getCurrentFrame() {
         return ResponseEntity.ok(service.getCurrentFrameUrl());
     }
 
-
-    @PreAuthorize("isAuthenticated()")
     @PostMapping("/anonymous-posts/frames/suggest-frame")
     public ResponseEntity<?> suggestNewFrame(@NotNull @RequestParam MultipartFile frame) {
         service.create(frame);

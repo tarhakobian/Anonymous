@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
-    protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
+    protected boolean shouldNotFilter(HttpServletRequest request) {
         return Arrays
                 .asList("/login", "/register")
                 .contains(request.getRequestURI());

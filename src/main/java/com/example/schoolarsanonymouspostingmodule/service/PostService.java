@@ -9,6 +9,7 @@ import com.example.schoolarsanonymouspostingmodule.repository.PostRepository;
 import com.example.schoolarsanonymouspostingmodule.util.Mapper;
 import com.example.schoolarsanonymouspostingmodule.util.SecurityUtil;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -16,9 +17,12 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class PostService {
+    private static final String S3_DIRECTORY = "posts";
+
     private final CommentService commentService;
     private final PostRepository postRepository;
     private final UserService userService;
+    private final S3StorageService storageService;
 
 
     public PostResponse getById(Integer postId) {
@@ -26,8 +30,8 @@ public class PostService {
         return Mapper.mapPost(entity);
     }
 
-    public List<PostResponse> getAll() {
-        return postRepository.findAllOrderById().stream()
+    public List<PostResponse> getAll(Integer pageNumber, Integer size) {
+        return postRepository.findAllOrderByIdDesc(PageRequest.of(pageNumber, size)).stream()
                 .peek(e -> e.setComments(commentService.getCommentsForPost(e)))
                 .map(Mapper::mapPost).toList();
     }
@@ -39,7 +43,7 @@ public class PostService {
         PostEntity postEntity = new PostEntity();
 
 
-        postEntity.setUrl("temporary url");
+        postEntity.setUrl(storageService.upload(request.getFile(), S3_DIRECTORY));
         postEntity.setPublisher(userEntity);
         postEntity.setUsernamePublic(request.isUsernamePublic());
 
@@ -51,22 +55,25 @@ public class PostService {
         return postEntity.getId();
     }
 
+    //TODO: s3 flow?
     public void edit(Integer postId, PostRequest request) {
         PostEntity postEntity = postRepository.findById(postId)
                 .filter(entity -> SecurityUtil.ensureOwnership(entity.getPublisher()))
                 .orElseThrow(PostNotFoundException::new);
 
-        //TODO rewrite after integrating with S3
         postEntity.setUrl("temporary url (updated or no)");
         postEntity.setUsernamePublic(request.isUsernamePublic());
 
         postRepository.save(postEntity);
     }
 
+    //TODO: add s3 flow
     public void delete(Integer postId) {
         PostEntity entity = postRepository.findById(postId)
                 .filter(e -> SecurityUtil.ensureOwnership(e.getPublisher()))
                 .orElseThrow(PostNotFoundException::new);
+
+        storageService.delete(entity.getUrl());
 
         postRepository.delete(entity);
     }
