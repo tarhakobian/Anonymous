@@ -7,13 +7,36 @@ import lombok.Data;
 import java.util.Set;
 import java.util.UUID;
 
+/**
+ * DTO representing the response for a post in the system.
+ * Author: Taron Hakobyan
+ */
 @Data
 @AllArgsConstructor
 @Builder
 public class PostResponse {
-    private Long id;
+    /**
+     * Unique identifier of the post.
+     */
+    private Integer id;
+
+    /**
+     * URL of the post referring to S3.
+     */
     private String url;
+
+    /**
+     * Username associated with the post.
+     */
     private String username;
+
+    /**
+     * Set of unique identifiers of users who liked the post.
+     */
     private Set<UUID> likedBy;
+
+    /**
+     * Set of comments in DTO form associated with the post.
+     */
     private Set<CommentResponse> comments;
 }

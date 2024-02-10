@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
@@ -35,9 +36,23 @@ public class UserEntity {
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
-            name = "likes",
+            name = "posts_likes",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "post_id")
     )
     private Set<PostEntity> likedPosts = new HashSet<>();
+
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "comments_likes",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "comment_id")
+    )
+    private Set<CommentEntity> likedComments = new HashSet<>();
+
+    @Column(name = "created_date")
+    private LocalDateTime createdDate;
+
+    @Column(name = "last_modified_date")
+    private LocalDateTime lastModifiedDate;
 }

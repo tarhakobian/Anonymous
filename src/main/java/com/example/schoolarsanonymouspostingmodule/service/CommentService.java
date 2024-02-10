@@ -1,49 +1,74 @@
 package com.example.schoolarsanonymouspostingmodule.service;
 
 import com.example.schoolarsanonymouspostingmodule.exception.CommentNotFoundException;
+import com.example.schoolarsanonymouspostingmodule.exception.CommentNotRelatedToThePostException;
 import com.example.schoolarsanonymouspostingmodule.exception.PostNotFoundException;
-import com.example.schoolarsanonymouspostingmodule.exception.UserNotFoundException;
 import com.example.schoolarsanonymouspostingmodule.model.dto.request.CommentRequest;
 import com.example.schoolarsanonymouspostingmodule.model.entity.CommentEntity;
 import com.example.schoolarsanonymouspostingmodule.model.entity.PostEntity;
 import com.example.schoolarsanonymouspostingmodule.model.entity.UserEntity;
 import com.example.schoolarsanonymouspostingmodule.repository.CommentRepository;
 import com.example.schoolarsanonymouspostingmodule.repository.PostRepository;
-import com.example.schoolarsanonymouspostingmodule.repository.UserRepository;
 import com.example.schoolarsanonymouspostingmodule.util.SecurityUtil;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
+import java.util.Objects;
 import java.util.Set;
-import java.util.UUID;
+import java.util.stream.Collectors;
 
+/**
+ * Service class for managing comments in the system.
+ * <p>
+ * Author : Taron Hakobyan
+ */
 @Service
 @RequiredArgsConstructor
 public class CommentService {
 
     private final CommentRepository commentRepository;
     private final PostRepository postRepository;
-    private final UserRepository userRepository;
+    private final UserService userService;
 
-
-    public void comment(CommentRequest request) {
+    /**
+     * Creates a new comment for a specific post.
+     *
+     * @param request The request containing post ID and comment content.
+     */
+    public Integer comment(CommentRequest request) {
         PostEntity postEntity = postRepository.findById(request.getPostId())
                 .orElseThrow(PostNotFoundException::new);
 
-        UUID userId = UUID.fromString(String.valueOf(SecurityContextHolder
-                .getContext().getAuthentication().getPrincipal()));
-        UserEntity publisher = userRepository.findById(userId)
-                .orElseThrow(UserNotFoundException::new);
+        CommentEntity parent = null;
+
+        if (request.getParentCommentId() != null) {
+            parent = commentRepository.findById(request.getParentCommentId()).
+                    orElseThrow(CommentNotFoundException::new);
+
+            if (!Objects.equals(parent.getPost().getId(), request.getPostId())) {
+                throw new CommentNotRelatedToThePostException();
+            }
+        }
+
+        UserEntity publisher = userService.getLoggedInUser();
 
         CommentEntity commentEntity = new CommentEntity();
         commentEntity.setContent(request.getContent());
         commentEntity.setPost(postEntity);
         commentEntity.setPublisher(publisher);
+        commentEntity.setParentComment(parent);
 
         commentRepository.save(commentEntity);
+
+        return commentEntity.getId();
     }
 
+    /**
+     * Deletes a comment based on its identifier.
+     *
+     * @param commentId The identifier of the comment to be deleted.
+     */
     public void deleteComment(Integer commentId) {
         CommentEntity commentEntity = commentRepository.findById(commentId)
                 .filter(c -> SecurityUtil.ensureOwnership(c.getPublisher()))
@@ -52,6 +77,12 @@ public class CommentService {
         commentRepository.delete(commentEntity);
     }
 
+    /**
+     * Edits the content of a comment based on its identifier.
+     *
+     * @param commentId The identifier of the comment to be edited.
+     * @param content   The updated content for the comment.
+     */
     public void edit(Integer commentId, String content) {
         CommentEntity commentEntity = commentRepository.findById(commentId)
                 .filter(c -> SecurityUtil.ensureOwnership(c.getPublisher()))
@@ -62,21 +93,80 @@ public class CommentService {
         commentRepository.save(commentEntity);
     }
 
+    /**
+     * Retrieves all comments for a specific post along with their associated replies.
+     * This method returns a Set of top-level comments for the given post entity,
+     * and for each top-level comment, it recursively fetches and sets its associated replies.
+     * The 'answers' property of each top-level comment is populated with its child comments.
+     *
+     * @param postEntity The post for which comments are to be retrieved.
+     * @return Set of top-level comments with their associated replies.
+     */
     public Set<CommentEntity> getCommentsForPost(PostEntity postEntity) {
+        // Retrieve top-level comments for the specified post
         Set<CommentEntity> topLevelComments = commentRepository.findByPostAndParentCommentIsNull(postEntity);
 
-        for (CommentEntity comment : topLevelComments) {
-            fetchReplies(comment);
-        }
-
-        return topLevelComments;
+        // For each top-level comment, recursively fetch and set associated replies
+        return topLevelComments.stream()
+                .peek(this::fetchReplies)
+                .collect(Collectors.toSet());
     }
 
+
+    /**
+     * Recursively fetches and sets replies for a specific comment.
+     * The method populates the 'answers' property of the given comment
+     * with its associated child comments.
+     *
+     * @param comment The comment for which replies are to be fetched.
+     */
     private void fetchReplies(CommentEntity comment) {
+        // Retrieve child comments for the current comment
         Set<CommentEntity> replies = commentRepository.findByParentComment(comment);
+
+        // Recursively fetch replies for each child comment
         for (CommentEntity reply : replies) {
             fetchReplies(reply);
         }
+
+        // Set the 'answers' property of the comment with its associated replies
         comment.setAnswers(replies);
+    }
+
+
+    /**
+     * Likes a specific comment.
+     *
+     * @param commentId The identifier of the comment to be liked.
+     */
+    public void like(Integer commentId) {
+        CommentEntity commentEntity = commentRepository.findById(commentId)
+                .orElseThrow(CommentNotFoundException::new);
+
+        UserEntity userEntity = userService.getLoggedInUser();
+
+        userEntity.getLikedComments().add(commentEntity);
+        commentEntity.getLikedBy().add(userEntity);
+
+        userService.save(userEntity);
+        commentRepository.save(commentEntity);
+    }
+
+    /**
+     * Removes the like from a specific comment.
+     *
+     * @param commentId The identifier of the comment from which the like is to be removed.
+     */
+    public void unlike(Integer commentId) {
+        CommentEntity commentEntity = commentRepository.findById(commentId)
+                .orElseThrow(CommentNotFoundException::new);
+
+        UserEntity userEntity = userService.getLoggedInUser();
+
+        userEntity.getLikedComments().remove(commentEntity);
+        commentEntity.getLikedBy().remove(userEntity);
+
+        userService.save(userEntity);
+        commentRepository.save(commentEntity);
     }
 }

@@ -29,4 +29,5 @@ public class FrameController {
         service.create(frame);
         return new ResponseEntity<>(HttpStatus.OK);
     }
+
 }

@@ -70,7 +70,7 @@ public class S3StorageService {
     }
 
     public String delete(String url) {
-     return null;
+        return null;
     }
 
 

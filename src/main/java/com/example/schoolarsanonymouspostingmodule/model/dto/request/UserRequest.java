@@ -1,4 +1,4 @@
-package com.example.schoolarsanonymouspostingmodule.model.dto;
+package com.example.schoolarsanonymouspostingmodule.model.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.Email;
@@ -16,18 +16,15 @@ import java.util.UUID;
  */
 @Getter
 @Setter
-public class User {
+public class UserRequest {
 
-    /**
-     * Read-only field representing the unique identifier of the user.
-     */
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private UUID id;
 
     /**
      * Email address of the user.
      * Should match the pattern ".*@student\.glendale\.edu".
      */
+
     @NotNull
     @Email(regexp = ".*@student\\.glendale\\.edu")
     private String email;
@@ -39,6 +36,5 @@ public class User {
      */
     @NotNull
     @Size(min = 6)
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
 }

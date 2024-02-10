@@ -35,4 +35,7 @@ public class CommentEntity {
     @OneToMany(mappedBy = "parentComment", fetch = FetchType.LAZY)
     private Set<CommentEntity> answers = new HashSet<>();
 
+    @ManyToMany(mappedBy = "likedComments", fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    private Set<UserEntity> likedBy;
+
 }
