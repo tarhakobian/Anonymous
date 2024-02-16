@@ -1,7 +1,7 @@
 package com.example.schoolarsanonymouspostingmodule.service;
 
+import com.example.schoolarsanonymouspostingmodule.exception.CommentDoesNotBelongToThePostException;
 import com.example.schoolarsanonymouspostingmodule.exception.CommentNotFoundException;
-import com.example.schoolarsanonymouspostingmodule.exception.CommentNotRelatedToThePostException;
 import com.example.schoolarsanonymouspostingmodule.exception.PostNotFoundException;
 import com.example.schoolarsanonymouspostingmodule.model.dto.request.CommentRequest;
 import com.example.schoolarsanonymouspostingmodule.model.entity.CommentEntity;
@@ -13,7 +13,6 @@ import com.example.schoolarsanonymouspostingmodule.util.SecurityUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -47,7 +46,7 @@ public class CommentService {
                     orElseThrow(CommentNotFoundException::new);
 
             if (!Objects.equals(parent.getPost().getId(), request.getPostId())) {
-                throw new CommentNotRelatedToThePostException();
+                throw new CommentDoesNotBelongToThePostException();
             }
         }
 
@@ -58,6 +57,7 @@ public class CommentService {
         commentEntity.setPost(postEntity);
         commentEntity.setPublisher(publisher);
         commentEntity.setParentComment(parent);
+        commentEntity.setUsernamePublic(request.getUsernamePublic());
 
         commentRepository.save(commentEntity);
 

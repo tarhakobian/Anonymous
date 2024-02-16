@@ -21,21 +21,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 public class CommentControllerTest {
-    private static MockMvc mockMvc;
-
-    @Autowired
-    public void setMockMvc(MockMvc mockBean) {
-        mockMvc = mockBean;
-    }
-
-    private static String jwtToken = "";
-
     private static final ObjectMapper mapper = new ObjectMapper();
+    private static MockMvc mockMvc;
+    private static String jwtToken = "";
 
     @BeforeAll
     public static void setJwtToken(@Autowired MockMvc mockMvc) throws Exception {
         UserRequest userRequest = new UserRequest();
-        userRequest.setEmail("taronhakobyan111123562131231231231@student.glendale.edu");
+        userRequest.setEmail("taronhakobyan1@student.glendale.edu");
         userRequest.setPassword("123456");
 
         // create a user
@@ -59,12 +52,18 @@ public class CommentControllerTest {
         jwtToken = jwtTokenReference.get();
     }
 
+    @Autowired
+    public void setMockMvc(MockMvc mockBean) {
+        mockMvc = mockBean;
+    }
+
     @Test
     public void commentTest() throws Exception {
         CommentRequest commentRequest = new CommentRequest();
 
         commentRequest.setPostId(1);
         commentRequest.setContent("Barev dzez");
+        commentRequest.setUsernamePublic(true);
 
         //attempt comment without authorization token : expects UNAUTHORIZED
         mockMvc.perform(post("/anonymous-posts/comment")
@@ -132,7 +131,7 @@ public class CommentControllerTest {
         HttpHeaders headers = new HttpHeaders();
         headers.add("Authorization", jwtToken);
 
-        //Valid request to comment expecting OK
+        //Valid request to reply expecting OK
         mockMvc.perform(post("/anonymous-posts/comment")
                         .contentType(MediaType.APPLICATION_JSON)
                         .headers(headers)

@@ -24,10 +24,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Transactional
 class UserControllerTest {
 
+    private static final ObjectMapper mapper = new ObjectMapper();
     @Autowired
     private MockMvc mockMvc;
-
-    private static final ObjectMapper mapper = new ObjectMapper();
 
     @Test
     public void registerTest() throws Exception {
@@ -128,7 +127,7 @@ class UserControllerTest {
                 .andExpect(status().isOk());
 
         UserRequest userRequest2 = new UserRequest();
-        userRequest2.setEmail("taronhakobyan11112384t78475tsdasdas@student.glendale.edu");
+        userRequest2.setEmail("taronhakobyan3sdasdas@student.glendale.edu");
         userRequest2.setPassword("123456");
 
         // create a user

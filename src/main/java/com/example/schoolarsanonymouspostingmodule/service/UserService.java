@@ -5,7 +5,6 @@ import com.example.schoolarsanonymouspostingmodule.exception.UserNotFoundExcepti
 import com.example.schoolarsanonymouspostingmodule.model.dto.User;
 import com.example.schoolarsanonymouspostingmodule.model.entity.UserEntity;
 import com.example.schoolarsanonymouspostingmodule.repository.UserRepository;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;

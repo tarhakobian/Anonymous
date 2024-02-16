@@ -45,7 +45,7 @@ public class UserController {
     @PreAuthorize("isAuthenticated()")
     @PatchMapping("users/change-username")
     public ResponseEntity<?> changeUsername(@NotNull @Size(min = 5, max = 20, message = "Username must be between 5 and 20 characters long.")
-                                                @RequestParam String username) {
+                                            @RequestParam String username) {
         UUID uuid = service.setUsername(username);
         return ResponseEntity.ok(uuid.toString());
     }

@@ -1,6 +1,7 @@
 package com.example.schoolarsanonymouspostingmodule.model.dto.request;
 
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -19,11 +20,14 @@ public class LoginRequest {
      * User's email for login.
      */
     @NotNull
+    @Size(max = 50)
     private String email;
 
     /**
      * User's password for login.
      */
+
     @NotNull
+    @Size(max = 50, min = 6)
     private String password;
 }

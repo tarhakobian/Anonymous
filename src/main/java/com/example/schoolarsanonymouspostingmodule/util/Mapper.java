@@ -26,16 +26,17 @@ public class Mapper {
                 .id(entity.getId())
                 .url(entity.getUrl())
                 .likedBy(entity.getLikedBy().stream()
-                        .map(UserEntity::getId)
+                        .map(UserEntity::getUsername)
                         .collect(Collectors.toSet()))
                 .comments(entity.getComments().stream()
                         .map(Mapper::mapComment)
                         .collect(Collectors.toSet()))
                 .build();
 
-        // Include the username in the response if usernamePublic is true
         if (entity.getUsernamePublic()) {
             response.setUsername(entity.getPublisher().getUsername());
+        } else {
+            response.setUsername("Anonymous");
         }
 
         return response;
@@ -52,7 +53,9 @@ public class Mapper {
         CommentResponse response = new CommentResponse();
         response.setId(entity.getId());
         //TODO ; change to username
-        response.setUsername(entity.getPublisher().getUsername());
+        if (entity.getUsernamePublic()) {
+            response.setUsername(entity.getPublisher().getUsername());
+        } else response.setUsername("Anonymous");
         response.setContent(entity.getContent());
 
         // Include parent comment id if the comment has a parent

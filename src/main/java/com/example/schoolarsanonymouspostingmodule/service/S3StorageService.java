@@ -40,7 +40,8 @@ public class S3StorageService {
                 ).build();
     }
 
-    public String upload(MultipartFile multipartFile, String directory) {
+    public String upload(MultipartFile multipartFile) {
+        String directory = "posts";
 
         String uuid = String.valueOf(UUID.randomUUID());
 
@@ -49,6 +50,7 @@ public class S3StorageService {
         ObjectMetadata objectMetadata = new ObjectMetadata();
         objectMetadata.setContentType("image/jpeg");
         objectMetadata.setContentLength(multipartFile.getSize());
+
 
         try {
             space.putObject(new PutObjectRequest(
@@ -69,8 +71,13 @@ public class S3StorageService {
         );
     }
 
-    public String delete(String url) {
-        return null;
+    public void delete(String url) {
+        String bucketName = "anonymousposts";
+
+        //extracts objectKey from url : ex. /posts/{uuid}.jpg
+        String objectKey = url.substring(51);
+
+        space.deleteObject(bucketName, objectKey);
     }
 
 

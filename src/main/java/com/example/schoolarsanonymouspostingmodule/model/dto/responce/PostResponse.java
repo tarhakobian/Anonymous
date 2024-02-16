@@ -5,7 +5,6 @@ import lombok.Builder;
 import lombok.Data;
 
 import java.util.Set;
-import java.util.UUID;
 
 /**
  * DTO representing the response for a post in the system.
@@ -33,7 +32,7 @@ public class PostResponse {
     /**
      * Set of unique identifiers of users who liked the post.
      */
-    private Set<UUID> likedBy;
+    private Set<String> likedBy;
 
     /**
      * Set of comments in DTO form associated with the post.

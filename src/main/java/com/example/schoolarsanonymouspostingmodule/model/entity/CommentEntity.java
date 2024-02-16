@@ -32,6 +32,9 @@ public class CommentEntity {
     @JoinColumn(name = "user_id")
     private UserEntity publisher;
 
+    @Column(name = "username_public")
+    private Boolean usernamePublic;
+
     @OneToMany(mappedBy = "parentComment", fetch = FetchType.LAZY)
     private Set<CommentEntity> answers = new HashSet<>();
 

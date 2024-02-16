@@ -1,2 +1,9 @@
-POST http://localhost:8080/anonymous-posts/comment/1?content=nicepost1
-Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI2YTI3N2YxZi0yMGJhLTQ0YmMtYjExOS1jMDVkOTYxOTFmOTMiLCJleHAiOjE3MDEyNDIwMjUsImF1dGhvcml0aWVzIjpbIlNUVURFTlQiXX0.XO_GkmyR4ZePH_JF0B1eHEw3xFFtLf9Nux4aiA5FDoQNqHhLa3RozqEKxEym1aIyHpjhe5ZpSbYyq7wwNJovbA
+POST http://localhost:8080/anonymous-posts/comment
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJiMDY3NWM0NS0wNmYyLTQ1YTEtYTViOC1mYWNjNDg1ZmI5OWIiLCJleHAiOjE3MDgxMjQ4ODQsImF1dGhvcml0aWVzIjpbIlNUVURFTlQiXX0.Rp5r_NKuLRDWNz_27ipvLZULmAiiRpkITyGzT8csfGZ0a_gpQgyIOYzt-o1zdSZ1HngTW3xBMXpndq6s3hTZxw
+Content-Type: application/json
+
+{
+  "postId": 1,
+  "content": "azizzzzzz",
+  "usernamePublic": true
+}

@@ -2,6 +2,7 @@ package com.example.schoolarsanonymouspostingmodule.model.dto.request;
 
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -22,10 +23,13 @@ public class CommentRequest {
     private Integer postId;
 
     @Positive
-    Integer parentCommentId;
+    private Integer parentCommentId;
     /**
      * The content of the comment.
      */
     @NotNull
+    @Size(max = 75)
     private String content;
+
+    private Boolean usernamePublic = false;
 }

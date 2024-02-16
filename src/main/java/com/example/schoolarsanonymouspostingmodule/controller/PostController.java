@@ -1,15 +1,16 @@
 package com.example.schoolarsanonymouspostingmodule.controller;
 
-import com.example.schoolarsanonymouspostingmodule.model.dto.request.PostRequest;
 import com.example.schoolarsanonymouspostingmodule.model.dto.responce.PostResponse;
 import com.example.schoolarsanonymouspostingmodule.service.PostService;
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 /**
  * Controller class for managing anonymous posts.
@@ -33,7 +34,8 @@ public class PostController {
     @GetMapping("/anonymous-posts/")
     public ResponseEntity<?> getAllPosts(@RequestParam(defaultValue = "0") Integer pageNumber,
                                          @RequestParam(defaultValue = "5") Integer size) {
-        return ResponseEntity.ok(postService.getAll(pageNumber, size));
+        List<PostResponse> postResponses = postService.getAll(pageNumber, size);
+        return ResponseEntity.ok(postResponses);
     }
 
     /**
@@ -43,7 +45,7 @@ public class PostController {
      * @return ResponseEntity with a PostResponse object.
      */
     @GetMapping("/anonymous-posts/{postId}")
-    public ResponseEntity<?> getPostById(@PathVariable("postId") @NotNull Integer postId) {
+    public ResponseEntity<?> getPostById(@PathVariable("postId") @Positive Integer postId) {
         PostResponse response = postService.getById(postId);
         return ResponseEntity.ok(response);
     }
@@ -51,25 +53,30 @@ public class PostController {
     /**
      * Creates a new anonymous post.
      *
-     * @param request The request body containing the post details.
-     * @return ResponseEntity with the created PostResponse object.
+     * @param multipartFile  The file to upload for the post.
+     * @param usernamePublic Optional flag indicating whether the username should be displayed publicly.
+     * @return ResponseEntity with the ID of the created post and status 201 Created.
      */
-    @PostMapping("/anonymous-posts/")
-    public ResponseEntity<?> create(@RequestBody @Valid PostRequest request) {
-        return ResponseEntity.ok(postService.create(request));
+    @PostMapping(value = "/anonymous-posts/", consumes = {"multipart/form-data"})
+    public ResponseEntity<?> create(@RequestParam("file") MultipartFile multipartFile,
+                                    @RequestParam(value = "usernamePublic", defaultValue = "false", required = false) boolean usernamePublic) {
+        Integer postId = postService.create(multipartFile, usernamePublic);
+        return new ResponseEntity<>(postId, HttpStatus.CREATED);
     }
 
     /**
      * Edits an existing anonymous post.
      *
-     * @param postId  Identifier of the post to be edited.
-     * @param request The request body containing the updated post details.
+     * @param postId         Identifier of the post to be edited.
+     * @param multipartFile  Optional file to upload for the post.
+     * @param usernamePublic Optional flag indicating whether the username should be displayed publicly.
      * @return ResponseEntity with status 200 OK.
      */
-    @PutMapping("/anonymous-posts/{postId}")
-    public ResponseEntity<?> edit(@PathVariable("postId") @NotNull Integer postId,
-                                  @RequestBody @Valid PostRequest request) {
-        postService.edit(postId, request);
+    @PutMapping(value = "/anonymous-posts/{postId}", consumes = {"multipart/form-data"})
+    public ResponseEntity<?> edit(@PathVariable("postId") @Positive Integer postId,
+                                  @RequestParam(value = "file", required = false) MultipartFile multipartFile,
+                                  @RequestParam(value = "usernamePublic", defaultValue = "false", required = false) boolean usernamePublic) {
+        postService.edit(postId, multipartFile, usernamePublic);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
@@ -80,7 +87,7 @@ public class PostController {
      * @return ResponseEntity with status 200 OK.
      */
     @DeleteMapping("/anonymous-posts/{postId}")
-    public ResponseEntity<?> delete(@PathVariable("postId") @NotNull Integer postId) {
+    public ResponseEntity<?> delete(@PathVariable("postId") @Positive Integer postId) {
         postService.delete(postId);
         return new ResponseEntity<>(HttpStatus.OK);
     }
@@ -92,7 +99,7 @@ public class PostController {
      * @return ResponseEntity with status 200 OK.
      */
     @PostMapping("/anonymous-posts/like/{postId}")
-    public ResponseEntity<?> like(@PathVariable @NotNull Integer postId) {
+    public ResponseEntity<?> like(@PathVariable @Positive Integer postId) {
         postService.like(postId);
         return new ResponseEntity<>(HttpStatus.OK);
     }
@@ -104,7 +111,7 @@ public class PostController {
      * @return ResponseEntity with status 200 OK.
      */
     @DeleteMapping("/anonymous-posts/like/{postId}")
-    public ResponseEntity<?> unLike(@PathVariable @NotNull Integer postId) {
+    public ResponseEntity<?> unLike(@PathVariable @Positive Integer postId) {
         postService.unLike(postId);
         return new ResponseEntity<>(HttpStatus.OK);
     }

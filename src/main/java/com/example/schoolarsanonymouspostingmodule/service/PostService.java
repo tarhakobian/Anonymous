@@ -1,7 +1,6 @@
 package com.example.schoolarsanonymouspostingmodule.service;
 
 import com.example.schoolarsanonymouspostingmodule.exception.PostNotFoundException;
-import com.example.schoolarsanonymouspostingmodule.model.dto.request.PostRequest;
 import com.example.schoolarsanonymouspostingmodule.model.dto.responce.PostResponse;
 import com.example.schoolarsanonymouspostingmodule.model.entity.PostEntity;
 import com.example.schoolarsanonymouspostingmodule.model.entity.UserEntity;
@@ -11,6 +10,7 @@ import com.example.schoolarsanonymouspostingmodule.util.SecurityUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -22,8 +22,6 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class PostService {
-    private static final String S3_DIRECTORY = "posts";
-
     private final CommentService commentService;
     private final PostRepository postRepository;
     private final UserService userService;
@@ -63,14 +61,14 @@ public class PostService {
      * @return The identifier of the created post.
      */
     //TODO : develop s3 flow
-    public Integer create(PostRequest request) {
+    public Integer create(MultipartFile file, boolean usernamePublic) {
         UserEntity userEntity = userService.getLoggedInUser();
 
         PostEntity postEntity = new PostEntity();
 
-        postEntity.setUrl(storageService.upload(request.getFile(), S3_DIRECTORY));
+        postEntity.setUrl(storageService.upload(file));
         postEntity.setPublisher(userEntity);
-        postEntity.setUsernamePublic(request.isUsernamePublic());
+        postEntity.setUsernamePublic(usernamePublic);
 
         userEntity.getPosts().add(postEntity);
 
@@ -88,13 +86,18 @@ public class PostService {
      * @param request The request containing updated post details.
      */
     //TODO : develop s3 flow
-    public void edit(Integer postId, PostRequest request) {
+    public void edit(Integer postId, MultipartFile file, boolean usernamePublic) {
         PostEntity postEntity = postRepository.findById(postId)
                 .filter(entity -> SecurityUtil.ensureOwnership(entity.getPublisher()))
                 .orElseThrow(PostNotFoundException::new);
 
-        postEntity.setUrl("temporary url (updated or no)");
-        postEntity.setUsernamePublic(request.isUsernamePublic());
+        if (file != null) {
+            String url = storageService.upload(file);
+            storageService.delete(url);
+            postEntity.setUrl(url);
+        }
+
+        postEntity.setUsernamePublic(usernamePublic);
 
         postRepository.save(postEntity);
     }

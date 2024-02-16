@@ -25,6 +25,7 @@ create table comments
     post_id           bigint references anonymous_posts (id),
     parent_comment_id int references comments (id) on delete cascade,
     content           text not null,
+    username_public   boolean   default false,
     created_date      timestamp default now()
 );
 

@@ -29,6 +29,7 @@ public class User {
      * Should match the pattern ".*@student\.glendale\.edu".
      */
     @NotNull
+    @Size(min = 21, max = 50)
     @Email(regexp = ".*@student\\.glendale\\.edu")
     private String email;
 
@@ -38,7 +39,7 @@ public class User {
      * Access is set to WRITE_ONLY to ensure it is not exposed in responses.
      */
     @NotNull
-    @Size(min = 6)
+    @Size(min = 6, max = 50)
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
 }
