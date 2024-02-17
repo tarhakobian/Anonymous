@@ -50,6 +50,13 @@ public class PostController {
         return ResponseEntity.ok(response);
     }
 
+    @PreAuthorize("isAuthenticated()")
+    @GetMapping("/anonymous-posts/liked-posts")
+    public ResponseEntity<?> getLikedPosts() {
+        List<PostResponse> postResponses = postService.getLikedPosts();
+        return ResponseEntity.ok(postResponses);
+    }
+
     /**
      * Creates a new anonymous post.
      *

@@ -22,10 +22,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
         return Arrays
-                .asList("/login", "/register")
+                .asList("/login", "/register", "/users/activate")
                 .contains(request.getRequestURI());
     }
-
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain filterChain) throws ServletException, IOException {

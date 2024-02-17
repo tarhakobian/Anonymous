@@ -1,0 +1,1 @@
+CREATE INDEX idx_is_deleted ON anonymous_posts (is_deleted);

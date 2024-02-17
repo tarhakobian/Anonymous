@@ -52,7 +52,6 @@ public class Mapper {
     public static CommentResponse mapComment(CommentEntity entity) {
         CommentResponse response = new CommentResponse();
         response.setId(entity.getId());
-        //TODO ; change to username
         if (entity.getUsernamePublic()) {
             response.setUsername(entity.getPublisher().getUsername());
         } else response.setUsername("Anonymous");

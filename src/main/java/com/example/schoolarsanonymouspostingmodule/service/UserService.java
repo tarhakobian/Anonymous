@@ -1,9 +1,12 @@
 package com.example.schoolarsanonymouspostingmodule.service;
 
 import com.example.schoolarsanonymouspostingmodule.exception.DuplicateUserException;
+import com.example.schoolarsanonymouspostingmodule.exception.IncorrectPasswordException;
 import com.example.schoolarsanonymouspostingmodule.exception.UserNotFoundException;
 import com.example.schoolarsanonymouspostingmodule.model.dto.User;
+import com.example.schoolarsanonymouspostingmodule.model.dto.request.LoginRequest;
 import com.example.schoolarsanonymouspostingmodule.model.entity.UserEntity;
+import com.example.schoolarsanonymouspostingmodule.repository.PostRepository;
 import com.example.schoolarsanonymouspostingmodule.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -13,11 +16,12 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 /**
  * Service class for managing user-related operations in the system.
@@ -30,6 +34,8 @@ public class UserService implements UserDetailsService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final PostRepository postRepository;
+
 
     /**
      * Retrieves the currently logged-in user.
@@ -59,6 +65,10 @@ public class UserService implements UserDetailsService {
         return new org.springframework.security.core.userdetails.User(
                 userEntity.getId().toString(),
                 userEntity.getPassword(),
+                true,
+                true,
+                true,
+                userEntity.getActive(),
                 Collections.singletonList(new SimpleGrantedAuthority(userEntity.getRole()))
         );
     }
@@ -79,7 +89,6 @@ public class UserService implements UserDetailsService {
         entity.setEmail(request.getEmail());
         entity.setRole("STUDENT");
         entity.setPassword(passwordEncoder.encode(request.getPassword()));
-        entity.setCreatedDate(LocalDateTime.now());
 
         userRepository.save(entity);
 
@@ -117,5 +126,33 @@ public class UserService implements UserDetailsService {
      */
     public void save(UserEntity userEntity) {
         userRepository.save(userEntity);
+    }
+
+    @Transactional
+    public void deleteAccount(String confirmedPassword) {
+        UserEntity entity = userRepository.findById(
+                UUID.fromString(String.valueOf(SecurityContextHolder.getContext()
+                        .getAuthentication().getPrincipal()))
+        ).orElseThrow(UserNotFoundException::new);
+
+        if (!passwordEncoder.encode(confirmedPassword).equals(entity.getPassword())) {
+            throw new IncorrectPasswordException();
+        }
+
+        postRepository.saveAll(
+                entity.getPosts().stream().peek(postEntity -> postEntity.setIsDeleted(true))
+                        .collect(Collectors.toSet())
+        );
+
+        entity.setActive(false);
+    }
+
+    public void reactivateAccount(LoginRequest request) {
+        UserEntity userEntity = userRepository.findByEmail(request.getEmail())
+                .orElseThrow(UserNotFoundException::new);
+
+        if (passwordEncoder.encode(request.getPassword()).equals(userEntity.getPassword())) {
+            userEntity.setActive(true);
+        } else throw new IncorrectPasswordException();
     }
 }

@@ -3,6 +3,9 @@ package com.example.schoolarsanonymouspostingmodule.model.entity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
@@ -13,6 +16,7 @@ import java.util.UUID;
 @Setter
 @Entity
 @Table(name = "users")
+@EntityListeners(AuditingEntityListener.class)
 public class UserEntity {
 
     @Id
@@ -31,6 +35,9 @@ public class UserEntity {
     @Column(name = "role")
     private String role;
 
+    @Column(name = "active")
+    private Boolean active;
+
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "publisher")
     private Set<PostEntity> posts = new HashSet<>();
 
@@ -42,6 +49,7 @@ public class UserEntity {
     )
     private Set<PostEntity> likedPosts = new HashSet<>();
 
+    //TODO
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "comments_likes",
@@ -50,9 +58,11 @@ public class UserEntity {
     )
     private Set<CommentEntity> likedComments = new HashSet<>();
 
-    @Column(name = "created_date")
-    private LocalDateTime createdDate;
+    @CreatedDate
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
 
-    @Column(name = "last_modified_date")
-    private LocalDateTime lastModifiedDate;
+    @LastModifiedDate
+    @Column(name = "last_modified_at")
+    private LocalDateTime lastUpdatedAt;
 }

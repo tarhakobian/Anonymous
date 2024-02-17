@@ -10,6 +10,7 @@ import com.example.schoolarsanonymouspostingmodule.util.SecurityUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -22,6 +23,8 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class PostService {
+
+
     private final CommentService commentService;
     private final PostRepository postRepository;
     private final UserService userService;
@@ -61,6 +64,7 @@ public class PostService {
      * @return The identifier of the created post.
      */
     //TODO : develop s3 flow
+    @Transactional
     public Integer create(MultipartFile file, boolean usernamePublic) {
         UserEntity userEntity = userService.getLoggedInUser();
 
@@ -85,7 +89,6 @@ public class PostService {
      * @param postId  The identifier of the post to be updated.
      * @param request The request containing updated post details.
      */
-    //TODO : develop s3 flow
     public void edit(Integer postId, MultipartFile file, boolean usernamePublic) {
         PostEntity postEntity = postRepository.findById(postId)
                 .filter(entity -> SecurityUtil.ensureOwnership(entity.getPublisher()))
@@ -108,14 +111,15 @@ public class PostService {
      *
      * @param postId The identifier of the post to be deleted.
      */
-    //TODO : develop s3 flow
+    @Transactional
     public void delete(Integer postId) {
         PostEntity entity = postRepository.findById(postId)
                 .filter(e -> SecurityUtil.ensureOwnership(e.getPublisher()))
                 .orElseThrow(PostNotFoundException::new);
 
-        storageService.delete(entity.getUrl());
-        postRepository.delete(entity);
+        entity.setIsDeleted(true);
+
+        postRepository.save(entity);
     }
 
     /**
@@ -123,6 +127,7 @@ public class PostService {
      *
      * @param postId The identifier of the post to be liked.
      */
+    @Transactional
     public void like(Integer postId) {
         PostEntity postEntity = postRepository.findById(postId)
                 .orElseThrow(PostNotFoundException::new);
@@ -141,6 +146,7 @@ public class PostService {
      *
      * @param postId The identifier of the post from which the like is to be removed.
      */
+    @Transactional
     public void unLike(Integer postId) {
         PostEntity postEntity = postRepository.findById(postId)
                 .orElseThrow(PostNotFoundException::new);
@@ -152,5 +158,11 @@ public class PostService {
 
         userService.save(userEntity);
         postRepository.save(postEntity);
+    }
+
+    public List<PostResponse> getLikedPosts() {
+        UserEntity userEntity = userService.getLoggedInUser();
+
+        return userEntity.getLikedPosts().stream().map(Mapper::mapPost).toList();
     }
 }

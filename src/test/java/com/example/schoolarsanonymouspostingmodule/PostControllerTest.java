@@ -29,6 +29,8 @@ public class PostControllerTest {
 
     private static final ObjectMapper mapper = new ObjectMapper();
     private static MockMvc mockMvc;
+
+    private static String adminJwtToken = "";
     private static String jwtToken = "";
 
     @BeforeAll
@@ -56,6 +58,22 @@ public class PostControllerTest {
                 );
 
         jwtToken = jwtTokenReference.get();
+
+        LoginRequest adminLoginRequest = new LoginRequest();
+        adminLoginRequest.setEmail("admin@schoolars.education");
+        adminLoginRequest.setPassword("tarondavit");
+
+        AtomicReference<String> adminJwtTokenReference = new AtomicReference<>("");
+        //login and get jwt
+        mockMvc.perform(post("/login").
+                        contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(adminLoginRequest)))
+                .andExpect(status().isOk()).andDo(result ->
+                        adminJwtTokenReference.set(result.getResponse().getHeader("Authorization"))
+                );
+
+        adminJwtToken = adminJwtTokenReference.get();
+
+
     }
 
     @Autowired
@@ -127,18 +145,29 @@ public class PostControllerTest {
         HttpHeaders headers = new HttpHeaders();
         headers.add("Authorization", jwtToken);
 
-        mockMvc.perform(delete("/anonymous-posts/51")
+        mockMvc.perform(delete("/anonymous-posts/50")
                         .headers(headers))
                 .andExpect(status().isOk());
     }
 
     @Test
     @Order(4)
+    public void adminDeleteTest() throws Exception {
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Authorization", adminJwtToken);
+
+        mockMvc.perform(delete("/anonymous-posts/3")
+                        .headers(headers))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @Order(5)
     void likeTest() throws Exception {
         HttpHeaders headers = new HttpHeaders();
         headers.add("Authorization", jwtToken);
 
-        mockMvc.perform(post("/anonymous-posts/like/50").headers(headers)).andExpect(status().isOk());
+        mockMvc.perform(post("/anonymous-posts/like/1").headers(headers)).andExpect(status().isOk());
     }
 
     @Test
@@ -147,7 +176,7 @@ public class PostControllerTest {
         HttpHeaders headers = new HttpHeaders();
         headers.add("Authorization", jwtToken);
 
-        mockMvc.perform(delete("/anonymous-posts/like/50").headers(headers)).andExpect(status().isOk());
+        mockMvc.perform(delete("/anonymous-posts/like/1").headers(headers)).andExpect(status().isOk());
     }
 
 

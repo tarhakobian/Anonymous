@@ -3,6 +3,7 @@ package com.example.schoolarsanonymouspostingmodule.filter;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.example.schoolarsanonymouspostingmodule.config.WebSecurityConfig;
+import com.example.schoolarsanonymouspostingmodule.exception.AccountIsLockedException;
 import com.example.schoolarsanonymouspostingmodule.model.dto.request.LoginRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.FilterChain;
@@ -42,6 +43,10 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authentication) throws IOException, ServletException {
         var principal = ((User) authentication.getPrincipal());
 
+        if (!principal.isAccountNonLocked()) {
+            throw new AccountIsLockedException();
+        }
+
         var builder = JWT.create()
                 .withSubject(principal.getUsername());
 
@@ -51,5 +56,6 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
                 .sign(Algorithm.HMAC512(WebSecurityConfig.JWT_SECRET.getBytes()));
 
         response.addHeader("Authorization", "Bearer " + jwtToken);
+
     }
 }

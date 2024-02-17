@@ -1,6 +1,7 @@
 package com.example.schoolarsanonymouspostingmodule.controller;
 
 import com.example.schoolarsanonymouspostingmodule.model.dto.User;
+import com.example.schoolarsanonymouspostingmodule.model.dto.request.LoginRequest;
 import com.example.schoolarsanonymouspostingmodule.service.UserService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -22,7 +23,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class UserController {
 
-    private final UserService service;
+    private final UserService userService;
 
     /**
      * Registers a new user.
@@ -32,7 +33,7 @@ public class UserController {
      */
     @PostMapping("/register")
     public ResponseEntity<String> register(@Valid @RequestBody User request) {
-        UUID uuid = service.register(request);
+        UUID uuid = userService.register(request);
         return new ResponseEntity<>(uuid.toString(), HttpStatus.CREATED);
     }
 
@@ -43,10 +44,25 @@ public class UserController {
      * @return ResponseEntity with the UUID of the user and status 200 OK.
      */
     @PreAuthorize("isAuthenticated()")
-    @PatchMapping("users/change-username")
+    @PatchMapping("/users/change-username")
     public ResponseEntity<?> changeUsername(@NotNull @Size(min = 5, max = 20, message = "Username must be between 5 and 20 characters long.")
                                             @RequestParam String username) {
-        UUID uuid = service.setUsername(username);
+        UUID uuid = userService.setUsername(username);
         return ResponseEntity.ok(uuid.toString());
     }
+
+    @PreAuthorize("isAuthenticated()")
+    @PatchMapping("/users/deactivate")
+    public ResponseEntity<?> deleteAccount(@RequestParam String confirmedPassword) {
+        userService.deleteAccount(confirmedPassword);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @PatchMapping("/users/activate")
+    public ResponseEntity<?> reactivateAccount(@RequestBody @Valid LoginRequest request) {
+        userService.reactivateAccount(request);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+
 }

@@ -1,8 +1,13 @@
 package com.example.schoolarsanonymouspostingmodule.util;
 
 import com.example.schoolarsanonymouspostingmodule.exception.IllegalActionException;
+import com.example.schoolarsanonymouspostingmodule.exception.UserNotFoundException;
 import com.example.schoolarsanonymouspostingmodule.model.entity.UserEntity;
+import com.example.schoolarsanonymouspostingmodule.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Component;
 
 import java.util.UUID;
 
@@ -11,7 +16,15 @@ import java.util.UUID;
  * <p>
  * Author : Taron Hakobyan
  */
+@Component
+@RequiredArgsConstructor
 public class SecurityUtil {
+    private static UserRepository userRepository;
+
+    @Autowired
+    public SecurityUtil(UserRepository userRepository) {
+        SecurityUtil.userRepository = userRepository;
+    }
 
     /**
      * Ensures that the currently logged-in user is the owner of a specified entity.
@@ -25,12 +38,16 @@ public class SecurityUtil {
         UUID userId = UUID.fromString(
                 String.valueOf(SecurityContextHolder.getContext().getAuthentication().getPrincipal()));
 
+
+        UserEntity userEntity = userRepository.findById(userId)
+                .orElseThrow(UserNotFoundException::new);
+
         // Check if the logged-in user is the owner
-        if (!userId.equals(owner.getId())) {
-            throw new IllegalActionException("You are not authorized to perform this action.");
+        if (userId.equals(owner.getId()) || userEntity.getRole().equals("ADMIN")) {
+            return true;
         }
 
-        return true;
+        throw new IllegalActionException("You are not authorized to perform this action.");
     }
 }
 
