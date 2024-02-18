@@ -33,7 +33,7 @@ authentication and authorization features.
 ## Getting Started
 
 1. Clone the repository
-2. Configure application.yml setting your serer, database and S3 properties.
+2. Configure application.yml setting your server, database and S3 properties.
 3. Run : docker-compose up -d
 4. Run : mvn clean package.
 5. Access the application in your web browser or Postman.
