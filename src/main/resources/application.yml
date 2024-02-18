@@ -16,7 +16,7 @@ server:
 
 s3:
   bucket: anonymousposts
-  access-key: DO00NCNANMFMPYJUWHCJ
-  secret-key: bMbbFJjtFhTxiOu/FLBO9b484a+KNRlSV/6LmJn0TWA
+  access-key: ***********
+  secret-key: ******************************
   service-endpoint: sfo2.digitaloceanspaces.com
   signing-region: sfo2
