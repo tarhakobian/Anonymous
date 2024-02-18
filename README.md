@@ -22,6 +22,7 @@ authentication and authorization features.
 ## Technologies Used
 
 - **Java:** Version : 17.
+- **Maven**
 - **Spring Boot:** Version : 3.1.5.
 - **Spring Security:** (ROLE based JWT) for user authentication and authorization.
 - **Spring Data JPA**
