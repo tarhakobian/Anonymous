@@ -1,0 +1,8 @@
+PATCH http://localhost:8080/users/activate
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI2YTI3N2YxZi0yMGJhLTQ0YmMtYjExOS1jMDVkOTYxOTFmOTMiLCJleHAiOjE3MDEyNDI3MjcsImF1dGhvcml0aWVzIjpbIlNUVURFTlQiXX0.LRR8XhWRV-WPXkH8eLV07iWwdd6qGM7KV3Rsv_O25y28YlYXe7cUpbvM_kRI0Ze7IsIjRny5CL1kfakLNMwueg
+Content-Type: application/json
+
+{
+  "email": "test@student.glendale.edu",
+  "password": "123456"
+}

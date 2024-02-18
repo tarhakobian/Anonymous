@@ -2,6 +2,6 @@ POST http://localhost:8080/login
 Content-Type: application/json
 
 {
-  "email": "taron9112@student.glendale.edu",
+  "email": "test@student.glendale.edu",
   "password": "123456"
 }

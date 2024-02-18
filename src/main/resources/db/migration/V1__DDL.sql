@@ -4,7 +4,7 @@ create table users
     email            text unique,
     username         text unique,
     password         text not null,
-    role             text             default 'STUDENT',
+    role             text             default 'ROLE_STUDENT',
     active           boolean          default true,
     created_at       timestamp,
     last_modified_at timestamp
@@ -47,7 +47,7 @@ create table comments_likes
 
 create table frames
 (
-    id         bigserial primary key,
+    id         serial primary key,
     url        text not null,
     times_used integer default 0
 );

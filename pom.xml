@@ -10,8 +10,8 @@
     <groupId>com.example</groupId>
     <artifactId>SchoolarsAnonymousPostingModule</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>SchoolarsAnonymousPostingModule</name>
-    <description>SchoolarsAnonymousPostingModule</description>
+    <name>Anonymous</name>
+    <description>Anonymous</description>
     <properties>
         <java.version>17</java.version>
     </properties>
