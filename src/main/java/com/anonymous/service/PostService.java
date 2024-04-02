@@ -52,7 +52,7 @@ public class PostService {
      * @return List of PostResponse representing the retrieved posts.
      */
     public List<PostResponse> getAll(Integer pageNumber, Integer size) {
-        return postRepository.findAllOrderByIdDesc(PageRequest.of(pageNumber, size)).stream()
+        return postRepository. findAllOrderedByCreatedAtDesc(PageRequest.of(pageNumber, size)).stream()
                 .peek(e -> e.setComments(commentService.getCommentsForPost(e)))
                 .map(Mapper::mapPost)
                 .toList();

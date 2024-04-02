@@ -24,8 +24,8 @@ public interface PostRepository extends JpaRepository<PostEntity, Integer> {
     @Query(value = "from PostEntity p left join fetch p.publisher" +
             " left join fetch p.comments c" +
             " left join c.answers" +
-            " left join fetch p.likedBy where p.isDeleted = false order by p.id ")
-    Page<PostEntity> findAllOrderByIdDesc(Pageable pageable);
+            " left join fetch p.likedBy where p.isDeleted = false order by p.createdAt desc")
+    Page<PostEntity> findAllOrderedByCreatedAtDesc(Pageable pageable);
 
     @Query(value = "from PostEntity p left join fetch p.publisher" +
             " left join fetch p.comments c" +
