@@ -1,10 +1,12 @@
 package com.anonymous.service;
 
+import com.anonymous.enums.Major;
 import com.anonymous.model.dto.User;
 import com.anonymous.exception.DuplicateUserException;
 import com.anonymous.exception.IncorrectPasswordException;
 import com.anonymous.exception.UserNotFoundException;
 import com.anonymous.model.dto.request.LoginRequest;
+import com.anonymous.model.dto.request.UserRequest;
 import com.anonymous.model.entity.UserEntity;
 import com.anonymous.repository.PostRepository;
 import com.anonymous.repository.UserRepository;
@@ -147,6 +149,7 @@ public class UserService implements UserDetailsService {
         );
 
         entity.setActive(false);
+        userRepository.save(entity);
     }
 
     /**
@@ -160,8 +163,19 @@ public class UserService implements UserDetailsService {
 
         if (passwordEncoder.matches(request.getPassword(), userEntity.getPassword())) {
             userEntity.setActive(true);
+            userRepository.save(userEntity);
         } else {
             throw new IncorrectPasswordException();
         }
+    }
+
+    public void setMajor(Major major) {
+        UserEntity entity = userRepository.findById(
+                        UUID.fromString(String.valueOf(SecurityContextHolder.getContext()
+                                .getAuthentication().getPrincipal())))
+                .orElseThrow(UserNotFoundException::new);
+
+        entity.setMajor(major);
+        userRepository.save(entity);
     }
 }

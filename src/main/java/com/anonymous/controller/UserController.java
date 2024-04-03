@@ -1,5 +1,6 @@
 package com.anonymous.controller;
 
+import com.anonymous.enums.Major;
 import com.anonymous.model.dto.User;
 import com.anonymous.model.dto.request.LoginRequest;
 import com.anonymous.service.UserService;
@@ -49,6 +50,13 @@ public class UserController {
                                             @RequestParam String username) {
         UUID uuid = userService.setUsername(username);
         return ResponseEntity.ok(uuid.toString());
+    }
+
+    @PreAuthorize("hasRole('ROLE_STUDENT')")
+    @PatchMapping("/users/set-major")
+    public ResponseEntity<?> setMajor(@NotNull @RequestParam Major major){
+        userService.setMajor(major);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     /**

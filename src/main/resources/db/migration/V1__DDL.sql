@@ -4,6 +4,7 @@ create table users
     email            text unique,
     username         text unique,
     password         text not null,
+    major            text,
     role             text             default 'ROLE_STUDENT',
     active           boolean          default true,
     created_at       timestamp,

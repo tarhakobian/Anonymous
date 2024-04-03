@@ -1,5 +1,6 @@
 package com.anonymous.model.entity;
 
+import com.anonymous.enums.Major;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -34,6 +35,9 @@ public class UserEntity {
 
     @Column(name = "password")
     private String password;
+
+    @Enumerated(EnumType.STRING)
+    private Major major;
 
     @Column(name = "role")
     private String role;
