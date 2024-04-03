@@ -37,6 +37,7 @@ public class UserEntity {
     private String password;
 
     @Enumerated(EnumType.STRING)
+    @Column(name = "major")
     private Major major;
 
     @Column(name = "role")
